@@ -1,7 +1,11 @@
 FROM debian:jessie
 MAINTAINER Egor Puzanov <epuzanov@gmx.de>
 
-ENV MEDIAWIKI_VERSION wmf/1.29.0-wmf.1
+ARG MEDIAWIKI_VERSION wmf/1.29.0-wmf.1
+ENV MEDIAWIKI_VERSION $MEDIAWIKI_VERSION
+
+ARG MEDIAWIKI_EXTENSIONS "VisualEditor CategoryTree ImageMap Collections"
+ENV MEDIAWIKI_EXTENSIONS $MEDIAWIKI_EXTENSIONS
 
 RUN set -x; \
     apt-get update \
@@ -34,15 +38,11 @@ RUN set -x; \
     && git submodule update --init skins \
     && git submodule update --init vendor \
     && cd extensions \
-    && git submodule update --init VisualEditor \
-    && cd VisualEditor \
+    && for EXT in $MEDIAWIKI_EXTENSIONS ; do git submodule update --init $EXT \
+    && cd $EXT \
     && git checkout $MEDIAWIKI_VERSION \
     && git submodule update --init \
-    && cd .. \
-    && git submodule update --init Collection \
-    && cd Collection \
-    && git checkout $MEDIAWIKI_VERSION \
-    && git submodule update --init
+    && cd .. ; done
 
 COPY php.ini /usr/local/etc/php/conf.d/mediawiki.ini
 
