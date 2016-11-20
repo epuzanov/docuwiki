@@ -16,7 +16,9 @@ RUN apt-get install -y python-pip python-lxml python-imaging python-bottle\
     && apt-get remove -y python-dev python-pip python3 gcc g++ make \
     && apt-get autoremove -y \
     && apt-get install -y python-setuptools \
-    && apt-get clean
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/cache/apt/archives/*
 
 # Create cache temporary directories
 RUN mkdir -p /data/mwcache

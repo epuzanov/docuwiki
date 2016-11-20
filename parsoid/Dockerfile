@@ -10,7 +10,8 @@ RUN set -x; \
     && apt-get install -y --force-yes --no-install-recommends parsoid \
     && apt-get clean \
     && update-rc.d parsoid disable \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/cache/apt/archives/*
 
 RUN mkdir -p /data
 

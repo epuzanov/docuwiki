@@ -194,6 +194,21 @@ if [ ! -e "LocalSettings.php" -a ! -z "$MEDIAWIKI_SITE_SERVER" ]; then
         # Append inclusion of /compose_conf/CustomSettings.php
         echo "@include('/conf/CustomSettings.php');" >> LocalSettings.php
 
+        for EXT in $MEDIAWIKI_EXTENSIONS
+            do
+                echo "require_once \"\$IP/extensions/$EXT/$EXT.php\";" >> LocalSettings.php
+            done
+        if [[ $MEDIAWIKI_EXTENSIONS == *"Collection"* ]] ; then
+                php maintenance/createAndPromote.php --bot --sysop --conf ./LocalSettings.php mwlib $MEDIAWIKI_ADMIN_PASS
+                sed -i 's/wgEnableUploads = false/wgEnableUploads = true/g' LocalSettings.php
+                echo "\$wgEnableWriteAPI = true;" >> LocalSettings.php
+                echo "\$wgGroupPermissions['user']['collectionsaveasuserpage'] = true;" >> LocalSettings.php
+                echo "\$wgGroupPermissions['autoconfirmed']['collectionsaveascommunitypage'] = true;" >> LocalSettings.php
+                echo "\$wgCollectionPODPartners = false;" >> LocalSettings.php
+                echo "\$wgCollectionFormats = array('rl' => 'PDF', 'odf' => 'ODT');" >> LocalSettings.php
+                echo "\$wgCollectionMWServeCredentials=\"$MEDIAWIKI_ADMIN_USER:$MEDIAWIKI_ADMIN_PASS\";" >> LocalSettings.php
+                echo "\$wgCollectionMWServeURL=\"http://mwlib:8899\";" >> LocalSettings.php
+        fi
 		# If we have a mounted share volume, move the LocalSettings.php to it
 		# so it can be restored if this container needs to be reinitiated
 		if [ -d "$MEDIAWIKI_SHARED" ]; then
