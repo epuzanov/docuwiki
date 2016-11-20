@@ -34,7 +34,7 @@ services:
             - MEDIAWIKI_SITE_NAME=MediaWiki
             - MEDIAWIKI_SITE_LANG=en
             - MEDIAWIKI_ADMIN_USER=admin
-            - MEDIAWIKI_ADMIN_PASS=rosebud
+            - MEDIAWIKI_ADMIN_PASS=password
             - MEDIAWIKI_DB_TYPE=mysql
             - MEDIAWIKI_DB_HOST=db
             - MEDIAWIKI_DB_PORT=3306
