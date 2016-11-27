@@ -14,6 +14,8 @@ RUN set -x; \
         apache2 \
         libapache2-mod-php5 \
         php5-mysql \
+        php5-pgsql \
+        php5-sqlite \
         php5-cli \
         php5-gd \
         php5-curl \
@@ -42,11 +44,12 @@ RUN set -x; \
     && cd $EXT \
     && git checkout $MEDIAWIKI_VERSION \
     && git submodule update --init \
-    && cd .. ; done
+    && cd .. ; done \
+    && cd /var/www/html \
+    && ln -s /usr/src/mediawiki/* . \
+    && rm images
 
-COPY php.ini /usr/local/etc/php/conf.d/mediawiki.ini
-
-COPY apache/mediawiki.conf /etc/apache2/
+COPY mediawiki.conf /etc/apache2/
 RUN echo "Include /etc/apache2/mediawiki.conf" >> /etc/apache2/apache2.conf
 
 COPY docker-entrypoint.sh /entrypoint.sh

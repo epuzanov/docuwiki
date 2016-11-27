@@ -11,13 +11,23 @@ services:
             - MYSQL_ROOT_PASSWORD=password
     mwlib:
         container_name: mwlib
-        build: mwlib-docker
+        image: mwlib:latest
+        build:
+            context: ./mwlib-docker
+            #args:
+            #    - http_proxy=http://proxy:port
+            #    - https_proxy=http://proxy:port
         restart: always
         volumes:
             - wikidata:/config:ro
     wiki:
         container_name: wiki
-        build: mediawiki-docker
+        image: mediawiki:latest
+        build:
+            context: ./mediawiki-docker
+            #args:
+            #    - http_proxy=http://proxy:port
+            #    - https_proxy=http://proxy:port
         restart: always
         ports:
             - 80:80
@@ -31,6 +41,7 @@ services:
             - MEDIAWIKI_VERSION=wmf/1.29.0-wmf.1
             - MEDIAWIKI_EXTENSIONS=CategoryTree ImageMap Collection
             - MEDIAWIKI_SITE_SERVER=http://192.168.1.1
+            - MEDIAWIKI_RESTBASE_URL=http://192.168.1.1
             - MEDIAWIKI_SITE_NAME=MediaWiki
             - MEDIAWIKI_SITE_LANG=en
             - MEDIAWIKI_ADMIN_USER=admin
@@ -44,7 +55,11 @@ services:
             - MEDIAWIKI_DB_NAME=wikidb
             - MEDIAWIKI_ENABLE_SSL=false
             - MEDIAWIKI_UPDATE=true
-            - MEDIAWIKI_RESTBASE_URL=http://192.168.1.1
+            - MEDIAWIKI_MAX_UPLOAD_SIZE=209715200
 volumes:
     wikidb:
+        external:
+            name: wikidb
     wikidata:
+        external:
+            name: wikidata

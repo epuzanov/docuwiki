@@ -8,13 +8,13 @@ db:
         - MYSQL_ROOT_PASSWORD=password
 mwlib:
     container_name: mwlib
-    build: mwlib-docker
+    build: ./mwlib-docker
     restart: always
     volumes:
         - wikidata:/config:ro
 wiki:
     container_name: wiki
-    build: mediawiki-docker
+    build: ./mediawiki-docker
     restart: always
     ports:
         - 80:80
@@ -28,6 +28,7 @@ wiki:
         - MEDIAWIKI_VERSION=wmf/1.29.0-wmf.1
         - MEDIAWIKI_EXTENSIONS=CategoryTree ImageMap Collection
         - MEDIAWIKI_SITE_SERVER=http://192.168.1.1
+        - MEDIAWIKI_RESTBASE_URL=http://192.168.1.1
         - MEDIAWIKI_SITE_NAME=MediaWiki
         - MEDIAWIKI_SITE_LANG=en
         - MEDIAWIKI_ADMIN_USER=admin
@@ -41,4 +42,4 @@ wiki:
         - MEDIAWIKI_DB_NAME=wikidb
         - MEDIAWIKI_ENABLE_SSL=false
         - MEDIAWIKI_UPDATE=true
-        - MEDIAWIKI_RESTBASE_URL=http://192.168.1.1
+        - MEDIAWIKI_MAX_UPLOAD_SIZE=209715200
