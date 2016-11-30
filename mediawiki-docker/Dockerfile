@@ -46,8 +46,28 @@ RUN set -x; \
     && git submodule update --init \
     && cd .. ; done \
     && cd /var/www/html \
-    && ln -s /usr/src/mediawiki/* . \
-    && rm images
+    && sed -i "s/\$wgScriptPath ? \$wgScriptPath :/\"http:\/\/\" \. getHostByName\(getHostName\(\)\) \./g" ./Collection/RenderingAPI.php \
+    && mkdir cache \
+    && echo "Deny from all" > cache/.htaccess \
+    && mkdir config \
+    && ln -s /usr/src/mediawiki/extensions extensions \
+    && ln -s /usr/src/mediawiki/includes includes \
+    && ln -s /usr/src/mediawiki/languages languages \
+    && ln -s /usr/src/mediawiki/maintenance maintenance \
+    && ln -s /usr/src/mediawiki/mw-config mw-config \
+    && ln -s /usr/src/mediawiki/resources resources \
+    && ln -s /usr/src/mediawiki/skins skins \
+    && ln -s /usr/src/mediawiki/vendor vendor \
+    && ln -s /usr/src/mediawiki/api.php api.php \
+    && ln -s /usr/src/mediawiki/autoload.php autoload.php \
+    && ln -s /usr/src/mediawiki/img_auth.php img_auth.php \
+    && ln -s /usr/src/mediawiki/index.php index.php \
+    && ln -s /usr/src/mediawiki/load.php load.php \
+    && ln -s /usr/src/mediawiki/opensearch_desc.php opensearch_desc.php \
+    && ln -s /usr/src/mediawiki/profileinfo.php profileinfo.php \
+    && ln -s /usr/src/mediawiki/thumb.php thumb.php \
+    && ln -s /usr/src/mediawiki/thumb_handler.php thumb_handler.php \
+    && ln -s /usr/src/mediawiki/wiki.phtml wiki.phtml
 
 COPY mediawiki.conf /etc/apache2/
 RUN echo "Include /etc/apache2/mediawiki.conf" >> /etc/apache2/apache2.conf

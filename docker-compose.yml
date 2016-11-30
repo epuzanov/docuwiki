@@ -27,8 +27,8 @@ wiki:
     environment:
         - MEDIAWIKI_VERSION=wmf/1.29.0-wmf.1
         - MEDIAWIKI_EXTENSIONS=CategoryTree ImageMap Collection
-        - MEDIAWIKI_SITE_SERVER=http://192.168.1.1
-        - MEDIAWIKI_RESTBASE_URL=http://192.168.1.1
+        - MEDIAWIKI_SITE_SERVER=https://192.168.1.1
+        - MEDIAWIKI_RESTBASE_URL=https://192.168.1.1
         - MEDIAWIKI_SITE_NAME=MediaWiki
         - MEDIAWIKI_SITE_LANG=en
         - MEDIAWIKI_ADMIN_USER=admin
@@ -40,6 +40,6 @@ wiki:
         - MEDIAWIKI_DB_USER=root
         - MEDIAWIKI_DB_PASSWORD=password
         - MEDIAWIKI_DB_NAME=wikidb
-        - MEDIAWIKI_ENABLE_SSL=false
+        - MEDIAWIKI_ENABLE_SSL=true
         - MEDIAWIKI_UPDATE=true
         - MEDIAWIKI_MAX_UPLOAD_SIZE=209715200

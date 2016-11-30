@@ -3,9 +3,10 @@ MAINTAINER Egor Puzanov <epuzanov@gmx.de>
 
 RUN apt-get update
 
-RUN apt-get install -y python-pip python-lxml python-imaging python-bottle\
+RUN apt-get install -y python-pip python-lxml python-imaging python-bottle \
     python-dev python-pypdf python-apipkg python-py python-simplejson\
     python-roman python-gevent python-greenlet pdftk ploticus blahtexml\
+    supervisor ca-certificates \
     && mkdir /etc/pip \
     && echo "[global]\ntrusted-host=pypi.pediapress.com\n" > /etc/pip/pip.conf \
     && pip install -i http://pypi.pediapress.com/simple/ mwlib \
@@ -18,19 +19,13 @@ RUN apt-get install -y python-pip python-lxml python-imaging python-bottle\
     && apt-get install -y python-setuptools \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /var/cache/apt/archives/*
+    && rm -rf /var/cache/apt/archives/* \
+    && mkdir -p /data/mwcache
 
-# Create cache temporary directories
-RUN mkdir -p /data/mwcache
-
-RUN echo "#!/bin/sh\n" > /usr/local/bin/start.sh \
-    && echo "if [ -f /config/customconfig.py ]; then\n" >> /usr/local/bin/start.sh \
-    && echo "    ln -s /config/customconfig.py /usr/local/lib/python2.7/dist-packages/customconfig.py\n" >> /usr/local/bin/start.sh \
-    && echo "fi\n" >> /usr/local/bin/start.sh \
-    && echo "nserve & mw-qserve & nslave --cachedir /data/mwcache & postman --cachedir /data/mwcache\n" >> /usr/local/bin/start.sh \
-    && chmod 755 /usr/local/bin/start.sh
+COPY docker-entrypoint.sh /entrypoint.sh
 
 VOLUME /config
 EXPOSE 8899
+ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["/usr/local/bin/start.sh"]
+CMD ["/bin/bash", "-c", "nserve & mw-qserve & nslave --cachedir /data/mwcache & postman --cachedir /data/mwcache"]

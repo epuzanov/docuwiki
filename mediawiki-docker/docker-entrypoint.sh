@@ -23,8 +23,6 @@ if [ $MEDIAWIKI_DB_TYPE = 'mysql' ]; then
         sleep 1
     done
 
-    export MEDIAWIKI_DB_TYPE MEDIAWIKI_DB_HOST MEDIAWIKI_DB_USER MEDIAWIKI_DB_PASSWORD MEDIAWIKI_DB_NAME
-
 TERM=dumb php -- $MEDIAWIKI_DB_TYPE $MEDIAWIKI_DB_HOST $MEDIAWIKI_DB_PORT $MEDIAWIKI_DB_SCHEMA $MEDIAWIKI_DB_USER $MEDIAWIKI_DB_PASSWORD $MEDIAWIKI_DB_NAME <<'EOPHP'
 <?php
 $MEDIAWIKI_DB_TYPE = $argv[1];
@@ -77,7 +75,9 @@ if [ -d "$MEDIAWIKI_SHARED" ]; then
 	if [ ! -d "$MEDIAWIKI_SHARED/images" ]; then
 		mkdir "$MEDIAWIKI_SHARED/images"
 	fi
-	ln -s "$MEDIAWIKI_SHARED/images" images
+	if [ ! -h /var/www/html/images ]; then
+		ln -s "$MEDIAWIKI_SHARED/images" images
+	fi
 
 	# If an extensions folder exists inside the shared directory, as long as
 	# /var/www/html/extensions is not already a symbolic link, then replace it
@@ -107,7 +107,11 @@ if [ -d "$MEDIAWIKI_SHARED" ]; then
 	if [ $MEDIAWIKI_ENABLE_SSL = true ]; then
 		echo >&2 'info: enabling ssl'
 		a2enmod ssl
-
+		if [ ! -f "$MEDIAWIKI_SHARED/ssl.key" -o ! -f "$MEDIAWIKI_SHARED/ssl.crt" -o ! -f "$MEDIAWIKI_SHARED/ssl.bundle.crt" ]; then
+			HOSTNAME=`echo $MEDIAWIKI_SITE_SERVER | sed -e "s/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/"`
+			openssl req -x509 -newkey rsa:4096 -keyout $MEDIAWIKI_SHARED/ssl.key -out $MEDIAWIKI_SHARED/ssl.crt -days 365 -nodes -subj "/C=DE/ST=Bonn/L=NRW/O=$MEDIAWIKI_SITE_NAME/OU=Org/CN=$HOSTNAME"
+			cp $MEDIAWIKI_SHARED/ssl.crt $MEDIAWIKI_SHARED/ssl.bundle.crt
+		fi
 		cp "$MEDIAWIKI_SHARED/ssl.key" /etc/apache2/ssl.key
 		cp "$MEDIAWIKI_SHARED/ssl.crt" /etc/apache2/ssl.crt
 		cp "$MEDIAWIKI_SHARED/ssl.bundle.crt" /etc/apache2/ssl.bundle.crt
@@ -126,7 +130,7 @@ chown -R www-data:www-data $MEDIAWIKI_SHARED/images
 chmod 755 $MEDIAWIKI_SHARED/images
 
 # If there is no LocalSettings.php, create one using maintenance/install.php
-if [ ! -e "LocalSettings.php" -a ! -z "$MEDIAWIKI_SITE_SERVER" ]; then
+if [ ! -e "$MEDIAWIKI_SHARED/LocalSettings.php" -a ! -z "$MEDIAWIKI_SITE_SERVER" ]; then
 	php maintenance/install.php \
 		--confpath /var/www/html \
 		--dbname "$MEDIAWIKI_DB_NAME" \
@@ -162,6 +166,7 @@ if [ ! -e "LocalSettings.php" -a ! -z "$MEDIAWIKI_SITE_SERVER" ]; then
             #apachectl stop
             sed -i 's/wgEnableUploads = false/wgEnableUploads = true/g' $MEDIAWIKI_SHARED/LocalSettings.php
             sed -i "s/wgLanguageCode = \"en\"/wgLanguageCode = \"$MEDIAWIKI_SITE_LANG\"/g" $MEDIAWIKI_SHARED/LocalSettings.php
+            sed -i "s/#\$wgCacheDirectory/\$wgCacheDirectory/g" $MEDIAWIKI_SHARED/LocalSettings.php
             echo "\$wgEnableWriteAPI = true;" >> $MEDIAWIKI_SHARED/LocalSettings.php
             echo "\$wgMaxArticleSize = 10240;" >> $MEDIAWIKI_SHARED/LocalSettings.php
             echo "\$wgMaxUploadSize = $MEDIAWIKI_MAX_UPLOAD_SIZE;" >> $MEDIAWIKI_SHARED/LocalSettings.php
