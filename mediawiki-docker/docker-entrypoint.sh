@@ -131,6 +131,9 @@ chmod 755 $MEDIAWIKI_SHARED/images
 
 # If there is no LocalSettings.php, create one using maintenance/install.php
 if [ ! -e "$MEDIAWIKI_SHARED/LocalSettings.php" -a ! -z "$MEDIAWIKI_SITE_SERVER" ]; then
+        if [ -e LocalSettings.php ]; then
+            rm LocalSettings.php
+        fi
 	php maintenance/install.php \
 		--confpath /var/www/html \
 		--dbname "$MEDIAWIKI_DB_NAME" \
