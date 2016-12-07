@@ -161,9 +161,7 @@ if [ ! -e "$MEDIAWIKI_SHARED/LocalSettings.php" -a ! -z "$MEDIAWIKI_SITE_SERVER"
             ln -s "$MEDIAWIKI_SHARED/LocalSettings.php" LocalSettings.php
         fi
         if [[ $MEDIAWIKI_EXTENSIONS == *"Collection"* ]] ; then
-            #apachectl start
-            #php maintenance/createAndPromote.php --bot --conf $MEDIAWIKI_SHARED/LocalSettings.php mwlib $MEDIAWIKI_ADMIN_PASS
-            #apachectl stop
+            php maintenance/createAndPromote.php --bot --conf $MEDIAWIKI_SHARED/LocalSettings.php mwlib $MEDIAWIKI_ADMIN_PASS
             sed -i 's/wgEnableUploads = false/wgEnableUploads = true/g' $MEDIAWIKI_SHARED/LocalSettings.php
             sed -i "s/wgLanguageCode = \"en\"/wgLanguageCode = \"$MEDIAWIKI_SITE_LANG\"/g" $MEDIAWIKI_SHARED/LocalSettings.php
             sed -i "s/#\$wgCacheDirectory/\$wgCacheDirectory/g" $MEDIAWIKI_SHARED/LocalSettings.php

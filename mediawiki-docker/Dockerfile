@@ -45,8 +45,8 @@ RUN set -x; \
     && git checkout $MEDIAWIKI_VERSION \
     && git submodule update --init \
     && cd .. ; done \
-    && cd /var/www/html \
     && sed -i "s/\$wgScriptPath ? \$wgScriptPath :/\"http:\/\/\" \. getHostByName\(getHostName\(\)\) \./g" ./Collection/RenderingAPI.php \
+    && cd /var/www/html \
     && mkdir cache \
     && echo "Deny from all" > cache/.htaccess \
     && mkdir config \
